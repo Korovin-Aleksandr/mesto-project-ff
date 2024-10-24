@@ -1,5 +1,5 @@
 // @todo: Функция создания карточки
-export const addCard = function (card, deleteButton, cardImagePopup, likeCard) {
+export const createCard = function (card, deleteButton, openCardImagePopup, likeCard) {
   const cardTemplate = document.querySelector('#card-template').content
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true)
   const cardTitle = cardElement.querySelector('.card__title')
@@ -12,7 +12,7 @@ export const addCard = function (card, deleteButton, cardImagePopup, likeCard) {
   cardImage.alt = card.name
 
   cardDeleteButton.addEventListener('click', deleteButton)
-  cardImage.addEventListener('click', () => cardImagePopup(card.name, card.link))
+  cardImage.addEventListener('click', () => openCardImagePopup(card.name, card.link))
   likeButton.addEventListener('click', () => likeCard(likeButton))
 
   return cardElement

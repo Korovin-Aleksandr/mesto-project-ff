@@ -19,14 +19,12 @@ export const closeModal= (modal) => {
 };
 
 //навешиваем слушатели
-export const listenerAdd = (modal) => {
-  const closeButton = document.querySelectorAll('.popup__close')
+export const addPopupClickListeners = (modal) => {
+  const closeButton = modal.querySelector('.popup__close')
 
-  closeButton.forEach((item) => {
-    item.addEventListener('click', () => {
+  closeButton.addEventListener('click', () => {
       closeModal(modal);
     });
-  });
  
    modal.addEventListener("mousedown", (event) => {
      if (event.target.classList.contains('popup')) {
