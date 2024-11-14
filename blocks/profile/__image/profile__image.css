@@ -1,12 +1,40 @@
 .profile__image {
+  position: relative;
   width: 120px;
   height: 120px;
+  border: none;
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+  cursor: pointer;
+}
+
+.icon {
+  position: absolute;
+  left: 50px;
+  top: 50px;
+}
+
+.profile__image .overlay {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  left: 0;
+  top: 0;
+  background-color: transparent; 
+  opacity: 0;
+}
+
+.profile__image:hover .overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+  outline: 1px solid rgba(0, 0, 0, 0.8);
+  opacity: 1;
 }
 
 @media screen and (max-width: 740px) {

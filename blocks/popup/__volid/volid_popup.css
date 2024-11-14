@@ -1,20 +1,17 @@
 .form_input-error {
+  display: block;
+  height: 30px;
   opacity: 0;
   font-size: 12px;
   line-height: 14.52px;
+  margin-top: 5px;
+  color: red;
 }
 
 .popup__input_type_error {
-  color: red;
+  border-bottom: 1px solid red;
 }
 
 .popup__error_visible {
   opacity: 1;
-}
-
-.popup__button_disabled {
-  border: 2px solid rgb(0 0 0/0.2);
-  border-radius: 2px;
-  background-color: transparent;
-  color: rgb(0 0 0/0.2);
 }
