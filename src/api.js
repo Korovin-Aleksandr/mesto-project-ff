@@ -6,6 +6,13 @@ export const config = {
   }
 };
 
+export function checkResponse(res) {
+  if (!res.ok) {
+    return Promise.reject(`Ошибка: ${res.status}`);
+  }
+  return res.json();
+}
+
 //api редактирование профиля
 export function editUserProfile(name, about) {
   return fetch(`${config.baseUrl}/users/me`, {
@@ -16,12 +23,7 @@ export function editUserProfile(name, about) {
       about: about
     })
   })
-  .then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  });
+  .then(checkResponse);
 }
 
 //api добавленя новой карточки
@@ -34,12 +36,7 @@ export function editNewCard(name, link) {
       link: link
     })
   })
-    .then((res) => {
-      if (!res.ok) {
-        return Promise.reject(`Ошибка: ${res.status}`);
-      }
-      return res.json();
-    });
+  .then(checkResponse);
 };
 
 //api добавленя редактирования аватара
@@ -50,36 +47,35 @@ export function editUserAvatar(avatar) {
     body: JSON.stringify({
       avatar: avatar,
     })
-  }).then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  })
+  }).then(checkResponse);
 };
 
 //запрос данных профиля с сервера
 export function fetchUserData() {
   return fetch(`${config.baseUrl}/users/me`, {
     headers: config.headers
-  })
-  .then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  })
+  }).then(checkResponse);
 };
 
 //запрос массива карточеек с сервера
 export function fetchCards() {
   return fetch(`${config.baseUrl}/cards`, {
     headers: config.headers
-  })
-  .then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  })
+  }).then(checkResponse);
+};
+
+//Функция удаления карточки
+export function removeCard(cardId) {
+  return fetch(`${config.baseUrl}/cards/${cardId}`, {
+    method: 'DELETE',
+    headers: config.headers,
+  }).then(checkResponse);
+};
+
+//функция лайка
+export function likeCard(cardId, method) {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+    method: method,
+    headers: config.headers,
+  }).then(checkResponse);
 };

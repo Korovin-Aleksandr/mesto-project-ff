@@ -1,8 +1,8 @@
 import '/pages/index.css';
-import {createCard, likeCard, removeCard} from './components/card.js';
+import {createCard} from './components/card.js';
 import {openModal, closeModal, addPopupClickListeners} from './components/modal.js';
-import {hideInputError, enableValidation} from './validation.js';
-import {editUserProfile, editNewCard, editUserAvatar, fetchUserData, fetchCards} from './api.js';
+import {clearValidation, enableValidation} from './validation.js';
+import {editUserProfile, editNewCard, editUserAvatar, fetchUserData, fetchCards, removeCard, likeCard} from './api.js';
 
 document.addEventListener('DOMContentLoaded', reloadUserDataAndCards);
 const placesList = document.querySelector('.places__list');
@@ -41,7 +41,14 @@ let userJob = '';
 let userId = '';
 let userAvatar = '';
 //контейнер карточки
-let cardForDelete = {}; 
+let cardForDelete = {};
+let validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'};
 
 //открытие попапа с картинкой
 const openCardImagePopup = (name, link) => {   
@@ -60,39 +67,18 @@ popups.forEach((modal) => {
 profileEditButton.addEventListener('click', () => {
   nameInput.value = userName;
   jobInput.value = userJob;
-  clearValidation(editProfileForm, {
-    formSelector: '.popup__form',
-    inputSelector: '.popup__input',
-    submitButtonSelector: '.popup__button',
-    inactiveButtonClass: 'popup__button_disabled',
-    inputErrorClass: 'popup__input_type_error',
-    errorClass: 'popup__error_visible'
-  });
+  clearValidation(editProfileForm, validationConfig);
   openModal(popupTypeEdit)
 });
 
 //открытие popup добавления карточки
 profileAdd.addEventListener('click', () => {
-  clearValidation(formImage, {
-    formSelector: '.popup__form',
-    inputSelector: '.popup__input',
-    submitButtonSelector: '.popup__button',
-    inactiveButtonClass: 'popup__button_disabled',
-    inputErrorClass: 'popup__input_type_error',
-    errorClass: 'popup__error_visible'
-  });
+  clearValidation(formImage, validationConfig);
   openModal(popupTypeNewCard)
 });
 
 profileImageButton.addEventListener('click', () => {
-  clearValidation(popapAvatarEdit, {
-    formSelector: '.popup__form',
-    inputSelector: '.popup__input',
-    submitButtonSelector: '.popup__button',
-    inactiveButtonClass: 'popup__button_disabled',
-    inputErrorClass: 'popup__input_type_error',
-    errorClass: 'popup__error_visible'
-  });
+  clearValidation(popapAvatarEdit, validationConfig);
   openModal(popapAvatarEdit)
 })
 
@@ -174,25 +160,7 @@ function submitEditAvatar(evt) {
 };
 formAvatar.addEventListener('submit', submitEditAvatar)
 
-// Функция очистки ошибок валидации и деактивации кнопки
-const clearValidation = (formElement, settings) => {
-  const inputList = Array.from(formElement.querySelectorAll(settings.inputSelector));
-  const submitButton = formElement.querySelector(settings.submitButtonSelector);
-  inputList.forEach((inputElement) => {
-    hideInputError(formElement, inputElement, settings);
-  });
-  submitButton.classList.add(settings.inactiveButtonClass);
-  submitButton.disabled = true;
-};
-
-enableValidation({
-  formSelector: '.popup__form',
-  inputSelector: '.popup__input',
-  submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
-  inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible'
-});
+enableValidation(validationConfig);
 
 //вывод всех данных с сервера (профиль, карточки)
 function reloadUserDataAndCards() {

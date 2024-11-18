@@ -1,4 +1,3 @@
-import {config} from '../api';
 //Функция создания карточки
 export const createCard = function (card, onDeleteCard, userId, openCardImagePopup, likeCard) {
   const cardTemplate = document.querySelector('#card-template').content
@@ -41,24 +40,3 @@ export const createCard = function (card, onDeleteCard, userId, openCardImagePop
   return cardElement
 };
 
-//Функция удаления карточки
-export function removeCard(cardId) {
-  return fetch(`${config.baseUrl}/cards/${cardId}`, {
-    method: 'DELETE',
-    headers: config.headers,
-  })
-  .then((res) => {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-    return res.json();
-  });
-};
-
-//функция лайка
-export function likeCard(cardId, method) {
-  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-    method: method, // Метод PUT для добавления и DELETE для удаления лайка
-    headers: config.headers,
-  }).then(response => response.json());
-}

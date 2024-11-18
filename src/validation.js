@@ -1,16 +1,27 @@
+export const toggleButtonState = (inputList, submitButton, errorSettings) => {
+  if (inputList.some((inputElement) => !inputElement.validity.valid)) {
+    submitButton.classList.add(errorSettings.inactiveButtonClass);
+    submitButton.disabled = true;
+  } else {
+    submitButton.classList.remove(errorSettings.inactiveButtonClass);
+    submitButton.disabled = false;
+  }
+};
+
 export const showInputError = (formElement, inputElement, errorMessage, errorSettings) => {
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.add('popup__input_type_error');
+    inputElement.classList.add(errorSettings.inputErrorClass);
     errorElement.textContent = errorMessage;
     errorElement.classList.add(errorSettings.errorClass);
   };
   
 export const hideInputError = (formElement, inputElement, errorSettings) => {
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.remove('popup__input_type_error');
+    inputElement.classList.remove(errorSettings.inputErrorClass);
     errorElement.classList.remove(errorSettings.inputErrorClass);
     errorElement.classList.remove(errorSettings.errorClass);
     errorElement.textContent = '';
+    inputElement.setCustomValidity("");
   };
   
   
@@ -30,22 +41,13 @@ export const checkInputValidity = (formElement, inputElement, errorSettings) => 
 export const setEventListeners = (formElement, errorSettings) => {
     const inputList = Array.from(formElement.querySelectorAll(errorSettings.inputSelector));
     const submitButton = formElement.querySelector(errorSettings.submitButtonSelector);
-    const toggleButtonState = () => {
-      if (inputList.some((inputElement) => !inputElement.validity.valid)) {
-        submitButton.classList.add(errorSettings.inactiveButtonClass);
-        submitButton.disabled = true;
-      } else {
-        submitButton.classList.remove(errorSettings.inactiveButtonClass);
-        submitButton.disabled = false;
-      }
-    }
-      inputList.forEach((inputElement) => {
-        inputElement.addEventListener('input', () => {
-          checkInputValidity(formElement, inputElement, errorSettings);
-          toggleButtonState();
-        });
+    inputList.forEach((inputElement) => {
+      inputElement.addEventListener('input', () => {
+        checkInputValidity(formElement, inputElement, errorSettings);
+        toggleButtonState(inputList, submitButton, errorSettings);
       });
-      toggleButtonState();
+    });
+    toggleButtonState(inputList, submitButton, errorSettings);
   };
 
 export const enableValidation = (errorSettings) => {
@@ -57,3 +59,14 @@ export const enableValidation = (errorSettings) => {
       setEventListeners(formElement, errorSettings);
     });
   };
+
+// Функция очистки ошибок валидации и деактивации кнопки
+export const clearValidation = (formElement, settings) => {
+  const inputList = Array.from(formElement.querySelectorAll(settings.inputSelector));
+  const submitButton = formElement.querySelector(settings.submitButtonSelector);
+  inputList.forEach((inputElement) => {
+    hideInputError(formElement, inputElement, settings);
+  });
+  submitButton.classList.add(settings.inactiveButtonClass);
+  submitButton.disabled = true;
+};
