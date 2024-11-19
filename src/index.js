@@ -4,7 +4,6 @@ import {openModal, closeModal, addPopupClickListeners} from './components/modal.
 import {clearValidation, enableValidation} from './validation.js';
 import {editUserProfile, editNewCard, editUserAvatar, fetchUserData, fetchCards, removeCard, likeCard} from './api.js';
 
-document.addEventListener('DOMContentLoaded', reloadUserDataAndCards);
 const placesList = document.querySelector('.places__list');
 //popup картинки
 const popupTypeImage = document.querySelector('.popup_type_image');
@@ -42,15 +41,40 @@ let userId = '';
 let userAvatar = '';
 //контейнер карточки
 let cardForDelete = {};
-let validationConfig = {
+const validationConfig = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
   submitButtonSelector: '.popup__button',
   inactiveButtonClass: 'popup__button_disabled',
   inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible'};
+  errorClass: 'popup__error_visible'
+};
 
-//открытие попапа с картинкой
+document.addEventListener('DOMContentLoaded', reloadUserDataAndCards);
+
+//вывод всех данных с сервера (профиль, карточки)
+function reloadUserDataAndCards() {
+  console.log('Перезагрузка данных пользователя и карточек началась');
+  Promise.all([fetchUserData(), fetchCards()])
+    .then(([userData, cards]) => {
+      userId = userData._id;
+      userName = userData.name;
+      userJob = userData.about;
+      userAvatar = userData.avatar;
+
+      inputTypeName.textContent = userName;
+      inputTypeDescription.textContent = userJob;
+      document.querySelector('.profile__image').style.backgroundImage = `url(${userAvatar})`;
+  
+      placesList.textContent = '';
+      cards.forEach((card) => {
+        const cardElement = createCard(card, handleDeleteCard, userId, openCardImagePopup, likeCard);
+        placesList.append(cardElement);
+      });
+    })
+    .catch((error) => console.error('Ошибка при получении данных:', error));
+};
+  //открытие попапа с картинкой
 const openCardImagePopup = (name, link) => {   
   popupImage.src = link
   popupImage.alt = name
@@ -97,8 +121,11 @@ function submitEditProfile(evt) {
   submitButton.textContent = 'Сохранение...';
   submitButton.disabled = true;
   editUserProfile(updatedName, updatedAbout)
-    .then(() => {
-      reloadUserDataAndCards();
+    .then((response) => {
+      userName = response.name;
+      userJob = response.about;
+      inputTypeName.textContent = userName;
+      inputTypeDescription.textContent = userJob;
       closeModal(popupTypeEdit);
     })
     .catch((error) => {
@@ -119,9 +146,10 @@ function submitNewCard(evt) {
   const submitButton = popupTypeNewCard.querySelector('.popup__button');
   submitButton.textContent = 'Сохранение...';
   submitButton.disabled = true;
-  editNewCard (placeName,linkImage)
-    .then((result) => {
-      reloadUserDataAndCards();
+  editNewCard(placeName,linkImage)
+    .then((newCard) => {
+      const cardElement = createCard(newCard, handleDeleteCard, userId, openCardImagePopup, likeCard);
+      placesList.prepend(cardElement);
       closeModal(popupTypeNewCard);
       formImage.reset();
     })
@@ -144,10 +172,8 @@ function submitEditAvatar(evt) {
   submitButton.disabled = true;
   editUserAvatar(linkAvatar)
     .then((data) => {
+      userAvatar = data.avatar;
       document.querySelector('.profile__image').style.backgroundImage = `url(${data.avatar})`;
-    })
-    .then(() => {
-      reloadUserDataAndCards();
       closeModal(popapAvatarEdit);
     })
     .catch((error) => {
@@ -161,28 +187,6 @@ function submitEditAvatar(evt) {
 formAvatar.addEventListener('submit', submitEditAvatar)
 
 enableValidation(validationConfig);
-
-//вывод всех данных с сервера (профиль, карточки)
-function reloadUserDataAndCards() {
-  Promise.all([fetchUserData(), fetchCards()])
-    .then(([userData, cards]) => {
-      userId = userData._id;
-      userName = userData.name;
-      userJob = userData.about;
-      userAvatar = userData.avatar;
-
-      inputTypeName.textContent = userName;
-      inputTypeDescription.textContent = userJob;
-      document.querySelector('.profile__image').style.backgroundImage = `url(${userAvatar})`;
-  
-      placesList.textContent = '';
-      cards.forEach((card) => {
-        const cardElement = createCard(card, handleDeleteCard, userId, openCardImagePopup, likeCard);
-        placesList.append(cardElement);
-      });
-    })
-    .catch((error) => console.error('Ошибка при получении данных:', error));
-};
 
 const handleDeleteCard = (cardId, cardElement) => {
   cardForDelete = {
